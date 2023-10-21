@@ -17,17 +17,25 @@ import inflearn.jjwt.jwt.JwtAccessDeniedHandler;
 import inflearn.jjwt.jwt.JwtAuthenticationEntryPoint;
 import inflearn.jjwt.jwt.JwtSecurityConfig;
 import inflearn.jjwt.jwt.TokenProvider;
-import lombok.AllArgsConstructor;
 
-@AllArgsConstructor
 @EnableWebSecurity
 @EnableMethodSecurity
 @Configuration
 public class SecurityConfig {
 
     private final TokenProvider tokenProvider;
-    private final JwtAuthenticationEntryPoint JwtAuthenticationEntryPoint;
+    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
+
+    public SecurityConfig(
+        TokenProvider tokenProvider,
+        JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint,
+        JwtAccessDeniedHandler jwtAccessDeniedHandler
+    ) {
+        this.tokenProvider = tokenProvider;
+        this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
+        this.jwtAccessDeniedHandler = jwtAccessDeniedHandler;
+    }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -40,7 +48,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .exceptionHandling(exceptionHandling -> exceptionHandling
                         .accessDeniedHandler(jwtAccessDeniedHandler)
-                        .authenticationEntryPoint(JwtAuthenticationEntryPoint))
+                        .authenticationEntryPoint(jwtAuthenticationEntryPoint))
                 .authorizeHttpRequests(authorizeHttpRequests -> authorizeHttpRequests
                         .requestMatchers(antMatcher("/api/hello")).permitAll()
                         .requestMatchers(antMatcher("/api/authenticate")).permitAll()
